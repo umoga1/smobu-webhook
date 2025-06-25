@@ -135,7 +135,7 @@ async def try_forward_combined_data(external_id: str):
             "reservation": reservation_id,
             "additionalFields": [
                 {
-                    "name": "amyfinehouse_reservation_date_KcfEpQIQfF",
+                    "name": "amyfinehouse_booking_date_Fpnd2zUd3L",
                     "value": f"{created_at}"
                 }
             ]
@@ -145,6 +145,9 @@ async def try_forward_combined_data(external_id: str):
             "Authorization": f"Bearer {DUVE_BEARER_TOKEN}",
             "Content-Type": "application/json"
         }
+
+        print("*******")
+        print(duve_payload)
 
         async with httpx.AsyncClient() as client:
             response = await client.post(DUVE_HOOK_URL, json=duve_payload, headers=headers)
