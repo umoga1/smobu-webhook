@@ -120,39 +120,39 @@ async def try_forward_combined_data(external_id: str):
 
     print(f"smoobu dataaaaa: {smoobu_data}")
     
-    # if duve_data and smoobu_data:
-    #     # Both hooks received, extract and send to Duve
-    #     created_at = smoobu_data.get("created-at")
-    #     if not created_at:
-    #         return  # Don't send if incomplete
+    if duve_data and smoobu_data:
+        # Both hooks received, extract and send to Duve
+        created_at = smoobu_data.get("created-at")
+        if not created_at:
+            return  # Don't send if incomplete
         
-    #     reservation_id = duve_data.get("id")
-    #     if not reservation_id:
-    #         return  # Don't send if incomplete
+        reservation_id = duve_data.get("id")
+        if not reservation_id:
+            return  # Don't send if incomplete
 
-    #     duve_payload = {
-    #         "externalReservation": external_id,
-    #         "reservation": reservation_id,
-    #         "additionalFields": [
-    #             {
-    #                 "name": "amyfinehouse_reservation_date_KcfEpQIQfF",
-    #                 "value": f"{created_at}"
-    #             }
-    #         ]
-    #     }
+        duve_payload = {
+            "externalReservation": external_id,
+            "reservation": reservation_id,
+            "additionalFields": [
+                {
+                    "name": "amyfinehouse_reservation_date_KcfEpQIQfF",
+                    "value": f"{created_at}"
+                }
+            ]
+        }
 
-    #     headers = {
-    #         "Authorization": f"Bearer {DUVE_BEARER_TOKEN}",
-    #         "Content-Type": "application/json"
-    #     }
+        headers = {
+            "Authorization": f"Bearer {DUVE_BEARER_TOKEN}",
+            "Content-Type": "application/json"
+        }
 
-    #     async with httpx.AsyncClient() as client:
-    #         response = await client.post(DUVE_HOOK_URL, json=duve_payload, headers=headers)
-    #         print(f"Sent to Duve: {response.status_code} - {response.text}")
+        async with httpx.AsyncClient() as client:
+            response = await client.post(DUVE_HOOK_URL, json=duve_payload, headers=headers)
+            print(f"Sent to Duve: {response.status_code} - {response.text}")
 
-    #     # Optional: Clean up memory
-    #     del duve_reservation_details[external_id]
-    #     del smoobu_reservations[external_id]
+        # Optional: Clean up memory
+        del duve_reservation_details[external_id]
+        del smoobu_reservations[external_id]
 
 
 def handle_rate_update(user_id, data):
