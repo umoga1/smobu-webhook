@@ -27,7 +27,7 @@ async def receive_webhook(payload: WebhookPayload):
     return {"status": "received"}
 
 def handle_rate_update(user_id, data):
-    print(f"Updating rates for user {user_id}: {data}")
+    print(f"Updating rates for all user {user_id}: {data}")
 
 def handle_new_reservation(user_id, data):
     print(f"New reservation for user {user_id}: {data}")
