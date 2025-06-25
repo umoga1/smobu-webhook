@@ -157,7 +157,7 @@ def handle_rate_update(user_id, data):
 
 def handle_new_reservation(user_id, data):
     print(f"New reservation for user {user_id}: {data}")
-    await forward_to_duve(body.get("data", {}))
+    # await forward_to_duve(body.get("data", {}))
 
     return {"status": "received"}
 
