@@ -12,7 +12,7 @@ duve_reservation_details: Dict[str, Dict[str, Any]] = {}
 smoobu_reservations: Dict[str, Dict[str, Any]] = {}
 
 DUVE_HOOK_URL = "https://connect.duve.com/api/v1/hooks/duveconnect?pid=6856e4877bd2d41f36a42210"
-DUVE_BEARER_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImNvbXBhbnkiOiI1ZTJjNmQwNzk0ODQ2MTBjNDcxMTIwYmIiLCJjb25uZWN0aW9uIjoiNjg1NmU0ODc3YmQyZDQxZjM2YTQyMjEwIiwiYWRkaXRpb25hbEZpZWxkcyI6WyJhbXlmaW5laG91c2VfdHJpYWxfM1M2UlBoeDA3SiJdfSwiaXNzIjoiRHV2ZSIsImp0aSI6IlEwM1VsZF9MNyJ9.9FokiA2ox7NZwlpBfbANLJ0GO-twsfz6u5CSs_5s4F8"  # Replace with your actual Duve token
+DUVE_BEARER_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImNvbXBhbnkiOiI1ZTJjNmQwNzk0ODQ2MTBjNDcxMTIwYmIiLCJjb25uZWN0aW9uIjoiNjg1NmU0ODc3YmQyZDQxZjM2YTQyMjEwIiwiYWRkaXRpb25hbEZpZWxkcyI6WyJhbXlmaW5laG91c2VfdHJpYWxfRnBuZDJ6VWQzTCJdfSwiaXNzIjoiRHV2ZSIsImp0aSI6IlVkSDBSQWhzVSJ9.zVkKh1vXp9Xwo4ZK0dgptOJ3wF63GtIVYyVIx88Y1MM"  # Replace with your actual Duve token
 
 
 class DuveHookPayload(BaseModel):
@@ -135,7 +135,7 @@ async def try_forward_combined_data(external_id: str):
             "reservation": reservation_id,
             "additionalFields": [
                 {
-                    "name": "amyfinehouse_booking_date_Fpnd2zUd3L",
+                    "name": "amyfinehouse_trial_Fpnd2zUd3L",
                     "value": f"{created_at}"
                 }
             ]
