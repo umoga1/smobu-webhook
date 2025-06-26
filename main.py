@@ -12,7 +12,7 @@ duve_reservation_details: Dict[str, Dict[str, Any]] = {}
 smoobu_reservations: Dict[str, Dict[str, Any]] = {}
 
 DUVE_HOOK_URL = "https://connect.duve.com/api/v1/hooks/duveconnect?pid=6856e4877bd2d41f36a42210"
-DUVE_BEARER_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImNvbXBhbnkiOiI1ZTJjNmQwNzk0ODQ2MTBjNDcxMTIwYmIiLCJjb25uZWN0aW9uIjoiNjg1NmU0ODc3YmQyZDQxZjM2YTQyMjEwIiwiYWRkaXRpb25hbEZpZWxkcyI6WyJhbXlmaW5laG91c2VfdHJpYWxfRnBuZDJ6VWQzTCJdfSwiaXNzIjoiRHV2ZSIsImp0aSI6IlVkSDBSQWhzVSJ9.zVkKh1vXp9Xwo4ZK0dgptOJ3wF63GtIVYyVIx88Y1MM"  # Replace with your actual Duve token
+DUVE_BEARER_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImNvbXBhbnkiOiI1ZTJjNmQwNzk0ODQ2MTBjNDcxMTIwYmIiLCJjb25uZWN0aW9uIjoiNjg1NmU0ODc3YmQyZDQxZjM2YTQyMjEwIiwiYWRkaXRpb25hbEZpZWxkcyI6WyJhbXlmaW5laG91c2VfYm9va2luZ19kYXRlX0ZwbmQyelVkM0wiXX0sImlzcyI6IkR1dmUiLCJqdGkiOiJ2NThHa25EaHoifQ.lkLhikJYtO13qcMq-AZF9CnBHhTWx2xl9KcpdtI5fxo"  # Replace with your actual Duve token
 
 
 class DuveHookPayload(BaseModel):
@@ -25,20 +25,6 @@ class WebhookPayload(BaseModel):
     action: str
     user: int
     data: Any
-
-
-async def check_and_send(key):
-    if "source1" in cache[key] and "source2" in cache[key]:
-        combined = {
-            "from_source1": cache[key]["source1"],
-            "from_source2": cache[key]["source2"]
-        }
-        await send_to_target(combined)
-        del cache[key]
-
-async def send_to_target(data):
-    async with httpx.AsyncClient() as client:
-        await client.post("https://your-target-api.com/receive", json=data)
 
 
 @app.post("/duve/webhook")
@@ -67,56 +53,27 @@ async def receive_webhook(payload: WebhookPayload):
     print(payload.data)
 
     # You can implement custom logic here:
-    if payload.action == "updateRates":
-        handle_rate_update(payload.user, payload.data)
-    elif payload.action == "newReservation":
+    # if payload.action == "updateRates":
+    #     handle_rate_update(payload.user, payload.data)
+    if payload.action == "newReservation":
         # handle_new_reservation(payload.user, payload.data)
         external_id = str(payload.data.get("id"))
         smoobu_reservations[external_id] = payload.data
         print("--about to forward from SMOOBU")
         await try_forward_combined_data(external_id)
-    elif payload.action == "cancelReservation":
-        handle_cancel_reservation(payload.user, payload.data)
-    elif payload.action == "updateReservation":
-        handle_update_reservation(payload.user, payload.data)
+    # elif payload.action == "cancelReservation":
+    #     handle_cancel_reservation(payload.user, payload.data)
+    # elif payload.action == "updateReservation":
+    #     handle_update_reservation(payload.user, payload.data)
 
     return {"status": "Smoobu data received"}
 
-    # async def forward_to_duve(data):
-    #     duve_url = "https://connect.duve.com/api/v1/hooks/duveconnect?pid=6856e4877bd2d41f36a42210"
-    #     duve_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImNvbXBhbnkiOiI1ZTJjNmQwNzk0ODQ2MTBjNDcxMTIwYmIiLCJjb25uZWN0aW9uIjoiNjg1NmU0ODc3YmQyZDQxZjM2YTQyMjEwIiwiYWRkaXRpb25hbEZpZWxkcyI6WyJhbXlmaW5laG91c2VfdHJpYWxfM1M2UlBoeDA3SiJdfSwiaXNzIjoiRHV2ZSIsImp0aSI6IlEwM1VsZF9MNyJ9.9FokiA2ox7NZwlpBfbANLJ0GO-twsfz6u5CSs_5s4F8"
-
-    #     reservation_id = str(data.get("id", ""))
-    #     arrival = data.get("arrival", "")
-    #     departure = data.get("departure", "")
-    #     date_range = f"{arrival} to {departure}"
-
-    #     payload = {
-    #         "externalReservation": reservation_id,
-    #         "reservation": reservation_id,
-    #         "additionalFields": [
-    #             {
-    #                 "name": "amyfinehouse_reservation_date_KcfEpQIQfF",
-    #                 "value": date_range
-    #             }
-    #         ]
-    #     }
-
-    #     headers = {
-    #         "Authorization": f"Bearer {duve_token}",
-    #         "Content-Type": "application/json"
-    #     }
-
-    #     async with httpx.AsyncClient() as client:
-    #         response = await client.post(duve_url, json=payload, headers=headers)
-    #         print(f"Sent to Duve: {response.status_code} - {response.text}")
 
 async def try_forward_combined_data(external_id: str):
     duve_data = duve_reservation_details.get(external_id)
     smoobu_data = smoobu_reservations.get(external_id)
 
     print(f"duve dataaaaa: {duve_data}")
-    print(f"-----------")
 
     print(f"smoobu dataaaaa: {smoobu_data}")
     
@@ -135,7 +92,7 @@ async def try_forward_combined_data(external_id: str):
             "reservation": reservation_id,
             "additionalFields": [
                 {
-                    "name": "amyfinehouse_trial_Fpnd2zUd3L",
+                    "name": "amyfinehouse_booking_date_Fpnd2zUd3L",
                     "value": f"{created_at}"
                 }
             ]
@@ -158,17 +115,14 @@ async def try_forward_combined_data(external_id: str):
         del smoobu_reservations[external_id]
 
 
-def handle_rate_update(user_id, data):
-    print(f"Updating rates for all user {user_id}: {data}")
+# def handle_rate_update(user_id, data):
+#     print(f"Updating rates for all user {user_id}: {data}")
 
-def handle_new_reservation(user_id, data):
-    print(f"New reservation for user {user_id}: {data}")
-    # await forward_to_duve(body.get("data", {})) 
+# def handle_new_reservation(user_id, data):
+#     print(f"New reservation for user {user_id}: {data}")
 
-    return {"status": "received"}
+# def handle_cancel_reservation(user_id, data):
+#     print(f"Cancel reservation for user {user_id}: {data}")
 
-def handle_cancel_reservation(user_id, data):
-    print(f"Cancel reservation for user {user_id}: {data}")
-
-def handle_update_reservation(user_id, data):
-    print(f"Update reservation for user {user_id}: {data}")
+# def handle_update_reservation(user_id, data):
+#     print(f"Update reservation for user {user_id}: {data}")
