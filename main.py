@@ -254,6 +254,6 @@ async def get_product_info(product_codes: list[str]): # <--- This is where the p
         # Introduce a 5-second delay before the next iteration,
         # but only if it's not the last item in the list.
         if i < len(product_codes) - 1:
-            await asyncio.sleep(5) # Asynchronous sleep
+            await asyncio.sleep(3) # Asynchronous sleep
 
     return results
