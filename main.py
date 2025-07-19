@@ -1,10 +1,11 @@
 import os
 import json
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Dict, Any, Optional
 import asyncio
 import httpx
+from urllib.request import Request, urlopen
 
 app = FastAPI()
 
@@ -214,3 +215,40 @@ async def try_forward_combined_data(external_id: str):
 
 # def handle_update_reservation(user_id, data):
 #     print(f"Update reservation for user {user_id}: {data}")
+
+
+API_KEY = 'd27c346d8da653033781d3daddf4e7beff62bcdb6699859e44998d11622c05bd'
+
+@app.post("/get_product_info/")
+async def get_product_info(product_codes: list[str]): # <--- This is where the product codes are received from the body
+
+    if not API_KEY or API_KEY == 'YOUR API KEY HERE':
+        raise HTTPException(status_code=500, detail="API Key is not configured. Please replace 'YOUR API KEY HERE' with your actual Go-UPC API key.")
+
+    results = {}
+    for product_code in product_codes:
+        try:
+            req = Request('https://go-upc.com/api/v1/code/' + product_code)
+            req.add_header('Authorization', 'Bearer ' + API_KEY)
+
+            with urlopen(req) as response:
+                content = response.read()
+                data = json.loads(content.decode())
+
+            if data and "product" in data:
+                product_name = data["product"].get("name", "N/A")
+                product_description = data["product"].get("description", "N/A")
+                product_image = data["product"].get("imageUrl", "N/A")
+
+                results[product_code] = {
+                    "name": product_name,
+                    "description": product_description,
+                    "imageUrl": product_image
+                }
+            else:
+                results[product_code] = {"error": "Product data not found or invalid response from API"}
+
+        except Exception as e:
+            results[product_code] = {"error": f"Failed to retrieve data: {str(e)}"}
+
+    return results
