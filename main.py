@@ -238,12 +238,12 @@ async def get_product_info(product_codes: list[str]): # <--- This is where the p
             if data and "product" in data:
                 product_name = data["product"].get("name", "N/A")
                 product_description = data["product"].get("description", "N/A")
-                product_image = data["product"].get("imageUrl", "N/A")
+                category = data["product"].get("category", "N/A")
 
                 results[product_code] = {
                     "name": product_name,
                     "description": product_description,
-                    "imageUrl": product_image
+                    "category": category
                 }
             else:
                 results[product_code] = {"error": "Product data not found or invalid response from API"}
