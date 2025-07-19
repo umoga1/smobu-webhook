@@ -226,7 +226,7 @@ async def get_product_info(product_codes: list[str]): # <--- This is where the p
         raise HTTPException(status_code=500, detail="API Key is not configured. Please replace 'YOUR API KEY HERE' with your actual Go-UPC API key.")
 
     results = {}
-    for product_code in product_codes:
+    for i, product_code in enumerate(product_codes):
         try:
             req = Request('https://go-upc.com/api/v1/code/' + product_code)
             req.add_header('Authorization', 'Bearer ' + API_KEY)
@@ -250,5 +250,10 @@ async def get_product_info(product_codes: list[str]): # <--- This is where the p
 
         except Exception as e:
             results[product_code] = {"error": f"Failed to retrieve data: {str(e)}"}
+
+        # Introduce a 5-second delay before the next iteration,
+        # but only if it's not the last item in the list.
+        if i < len(product_codes) - 1:
+            await asyncio.sleep(5) # Asynchronous sleep
 
     return results
